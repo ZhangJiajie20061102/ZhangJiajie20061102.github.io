@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <script>
+    let a = parseFloat(prompt("Please enter coefficient a:"));
+    let b = parseFloat(prompt("Please enter coefficient b:"));
+    let c = parseFloat(prompt("Please enter constant term c:"));
+
+    let delta = b * b - 4 * a * c;
+    let x1 = (-b + Math.sqrt(delta)) / (2 * a);
+    let x2 = (-b - Math.sqrt(delta)) / (2 * a);
+
+    alert(`Quadratic equation ${a}x² + ${b}x + ${c} = 0 has roots:\nx1 = ${x1}\nx2 = ${x2}`);
+
+    console.log(`Quadratic equation ${a}x² + ${b}x + ${c} = 0 has roots:`);
+    console.log(`x1 = ${x1}`);
+    console.log(`x2 = ${x2}`);
+  </script>
+</body>
+</html>
