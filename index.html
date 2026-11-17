@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" class="no-js">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -11,6 +11,7 @@
 <meta property="og:title" content="Zhang Jiajie · 作品集">
 <meta property="og:description" content="从 socket 协议到云开发小程序，从算法游戏到经营数据看板。">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2308090b'/%3E%3Cpath d='M9 9h14v4H9zm0 10h14v4H9z' fill='%23ff5c35'/%3E%3C/svg%3E">
+<script>document.documentElement.className = "js";</script>
 <style>
   :root{
     --bg:#08090b;
@@ -588,18 +589,18 @@
   .foot-links a{color:var(--muted);transition:color .2s}
   .foot-links a:hover{color:var(--accent)}
 
-  /* ---------- 入场动画 ---------- */
-  .reveal{
+  /* ---------- 入场动画（仅 JS 可用时才隐藏，脚本失败时内容照常可见） ---------- */
+  .js .reveal{
     opacity:0;
     transform:translateY(18px);
   }
-  .reveal.in{
+  .js .reveal.in{
     opacity:1;
     transform:none;
     transition:opacity .8s var(--ease),transform .8s var(--ease);
   }
   @media (prefers-reduced-motion:reduce){
-    .reveal{opacity:1;transform:none}
+    .js .reveal{opacity:1;transform:none}
     html{scroll-behavior:auto}
     *{animation:none!important;transition:none!important}
   }
