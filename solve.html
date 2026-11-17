@@ -1,20 +1,511 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>一元二次方程求解器 · Zhang Jiajie</title>
+<meta name="description" content="输入 a、b、c，求一元二次方程的实根、重根或复数根，附判别式与求解步骤。">
+<meta name="theme-color" content="#08090b">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2308090b'/%3E%3Cpath d='M9 9h14v4H9zm0 10h14v4H9z' fill='%23ff5c35'/%3E%3C/svg%3E">
+<style>
+  :root{
+    --bg:#08090b;
+    --surface:#101217;
+    --line:#1f232b;
+    --line-soft:#171a20;
+    --text:#eceef2;
+    --muted:#8b9099;
+    --faint:#5c626c;
+    --accent:#ff5c35;
+    --ok:#43d17f;
+    --warn:#ffc43c;
+    --radius:16px;
+    --ease:cubic-bezier(.16,1,.3,1);
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  body{
+    margin:0;
+    min-height:100vh;
+    background:var(--bg);
+    color:var(--text);
+    font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+    display:flex;
+    flex-direction:column;
+  }
+  a{color:inherit;text-decoration:none}
+  ::selection{background:var(--accent);color:#0a0a0a}
+
+  .shell{
+    width:100%;
+    max-width:720px;
+    margin:0 auto;
+    padding:32px 24px 64px;
+    flex:1;
+  }
+
+  .top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:44px;
+  }
+  .back{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    font-size:13.5px;
+    color:var(--muted);
+    padding:7px 13px 7px 10px;
+    border:1px solid var(--line);
+    border-radius:999px;
+    transition:color .2s,border-color .2s,background .2s;
+  }
+  .back:hover{color:var(--text);border-color:#333943;background:var(--surface)}
+  .back svg{width:14px;height:14px}
+  .mark{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:12px;
+    color:var(--faint);
+    letter-spacing:.1em;
+  }
+
+  h1{
+    margin:0 0 10px;
+    font-size:clamp(28px,4.4vw,38px);
+    letter-spacing:-.03em;
+    font-weight:600;
+    line-height:1.15;
+  }
+  .sub{
+    margin:0 0 32px;
+    color:var(--muted);
+    font-size:15px;
+  }
+  .formula{
+    display:inline-block;
+    font-family:"Times New Roman",Georgia,serif;
+    font-style:italic;
+    font-size:1.05em;
+    color:#c8ccd4;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:2px 10px;
+    margin-left:4px;
+  }
+
+  fieldset{
+    border:0;
+    padding:0;
+    margin:0 0 24px;
+  }
+  .inputs{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px;
+  }
+  @media (max-width:560px){.inputs{grid-template-columns:1fr}}
+
+  .field{
+    position:relative;
+  }
+  .field label{
+    display:block;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:12px;
+    color:var(--faint);
+    margin-bottom:8px;
+    letter-spacing:.06em;
+  }
+  .field input{
+    width:100%;
+    padding:14px 14px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:11px;
+    color:var(--text);
+    font:inherit;
+    font-variant-numeric:tabular-nums;
+    font-size:16px;
+    transition:border-color .2s,background .2s,box-shadow .2s;
+    -moz-appearance:textfield;
+  }
+  .field input::-webkit-outer-spin-button,
+  .field input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .field input:hover{border-color:#2c313a}
+  .field input:focus{
+    outline:none;
+    border-color:var(--accent);
+    background:#14171d;
+    box-shadow:0 0 0 3px rgba(255,92,53,.14);
+  }
+  .field input.invalid{border-color:#e0574a;box-shadow:0 0 0 3px rgba(224,87,74,.14)}
+
+  .row-actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:16px;
+  }
+  button{
+    font:inherit;
+    cursor:pointer;
+    border-radius:10px;
+    transition:transform .18s var(--ease),background .2s,border-color .2s,box-shadow .2s;
+  }
+  .btn-primary{
+    padding:12px 22px;
+    border:0;
+    background:var(--accent);
+    color:#120703;
+    font-size:14.5px;
+    font-weight:500;
+    box-shadow:0 6px 24px -8px rgba(255,92,53,.6);
+  }
+  .btn-primary:hover{transform:translateY(-1px);box-shadow:0 10px 28px -8px rgba(255,92,53,.7)}
+  .btn-ghost{
+    padding:12px 18px;
+    border:1px solid var(--line);
+    background:var(--surface);
+    color:var(--muted);
+    font-size:14px;
+  }
+  .btn-ghost:hover{color:var(--text);border-color:#333943;background:#15181e}
+
+  .out{
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    background:linear-gradient(180deg,var(--surface),rgba(16,18,23,.5));
+    padding:24px;
+    min-height:132px;
+  }
+  .out-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:16px;
+    padding-bottom:14px;
+    border-bottom:1px solid var(--line-soft);
+  }
+  .out-label{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:11.5px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--faint);
+  }
+  .badge{
+    font-size:12px;
+    padding:3px 10px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    color:var(--muted);
+    background:rgba(255,255,255,.02);
+    white-space:nowrap;
+  }
+  .badge.ok{color:var(--ok);border-color:rgba(67,209,127,.3);background:rgba(67,209,127,.08)}
+  .badge.warn{color:var(--warn);border-color:rgba(255,196,60,.3);background:rgba(255,196,60,.08)}
+  .badge.err{color:#e07a6a;border-color:rgba(224,87,74,.3);background:rgba(224,87,74,.08)}
+
+  .empty{
+    color:var(--faint);
+    font-size:14px;
+  }
+
+  .roots{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-bottom:18px;
+  }
+  .root{
+    flex:1 1 180px;
+    border:1px solid var(--line);
+    border-radius:11px;
+    padding:14px 16px;
+    background:#0c0e12;
+  }
+  .root-k{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:11.5px;
+    color:var(--faint);
+    letter-spacing:.08em;
+    margin-bottom:6px;
+  }
+  .root-v{
+    font-size:19px;
+    font-variant-numeric:tabular-nums;
+    letter-spacing:-.01em;
+    color:var(--text);
+  }
+  .root-v small{color:var(--faint);font-size:.7em;margin-left:2px}
+
+  .steps{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:12.8px;
+    color:var(--muted);
+    line-height:1.95;
+    white-space:pre-wrap;
+    word-break:break-word;
+  }
+  .steps b{color:#c8ccd4;font-weight:500}
+  .steps .hl{color:var(--accent)}
+
+  footer{
+    border-top:1px solid var(--line-soft);
+    padding:22px 24px 30px;
+    text-align:center;
+    font-size:12.5px;
+    color:var(--faint);
+  }
+  footer a{color:var(--muted);transition:color .2s}
+  footer a:hover{color:var(--accent)}
+
+  a:focus-visible,button:focus-visible,input:focus-visible{
+    outline:2px solid var(--accent);
+    outline-offset:2px;
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
 <body>
-  <script>
-    let a = parseFloat(prompt("Please enter coefficient a:"));
-    let b = parseFloat(prompt("Please enter coefficient b:"));
-    let c = parseFloat(prompt("Please enter constant term c:"));
 
-    let delta = b * b - 4 * a * c;
-    let x1 = (-b + Math.sqrt(delta)) / (2 * a);
-    let x2 = (-b - Math.sqrt(delta)) / (2 * a);
+<div class="shell">
+  <div class="top">
+    <a class="back" href="index.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+      返回作品集
+    </a>
+    <span class="mark">TOOL / 01</span>
+  </div>
 
-    alert(`Quadratic equation ${a}x² + ${b}x + ${c} = 0 has roots:\nx1 = ${x1}\nx2 = ${x2}`);
+  <h1>一元二次方程求解器</h1>
+  <p class="sub">
+    输入三个系数，求 <span class="formula">ax² + bx + c = 0</span> 的根。判别式决定根的类型，复数根也照算。
+  </p>
 
-    console.log(`Quadratic equation ${a}x² + ${b}x + ${c} = 0 has roots:`);
-    console.log(`x1 = ${x1}`);
-    console.log(`x2 = ${x2}`);
-  </script>
+  <form id="form" autocomplete="off">
+    <fieldset>
+      <div class="inputs">
+        <div class="field">
+          <label for="a">a · 二次项系数</label>
+          <input id="a" name="a" type="number" step="any" inputmode="decimal" value="1" placeholder="0 以外">
+        </div>
+        <div class="field">
+          <label for="b">b · 一次项系数</label>
+          <input id="b" name="b" type="number" step="any" inputmode="decimal" value="-3" placeholder="可为 0">
+        </div>
+        <div class="field">
+          <label for="c">c · 常数项</label>
+          <input id="c" name="c" type="number" step="any" inputmode="decimal" value="2" placeholder="可为 0">
+        </div>
+      </div>
+      <div class="row-actions">
+        <button class="btn-primary" type="submit">求解</button>
+        <button class="btn-ghost" type="button" id="clear">清空</button>
+        <button class="btn-ghost" type="button" id="sample">换个例子</button>
+      </div>
+    </fieldset>
+  </form>
+
+  <div class="out" aria-live="polite">
+    <div class="out-head">
+      <span class="out-label">Result</span>
+      <span class="badge" id="badge">等待输入</span>
+    </div>
+    <div id="result">
+      <p class="empty">填好系数后点「求解」，这里会显示判别式与两个根。</p>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <a href="index.html">Zhang Jiajie · 作品集</a>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var form = document.getElementById("form");
+  var badge = document.getElementById("badge");
+  var out = document.getElementById("result");
+  var inputs = {
+    a: document.getElementById("a"),
+    b: document.getElementById("b"),
+    c: document.getElementById("c")
+  };
+
+  var samples = [
+    { a: 1, b: -3, c: 2 },     // 两个不同实根
+    { a: 1, b: 2, c: 1 },      // 重根
+    { a: 1, b: 0, c: 1 },      // 复数根
+    { a: 2, b: -7, c: 3 },     // 分数根
+    { a: 1, b: -2, c: -3 }     // 一正一负
+  ];
+  var sampleIdx = 0;
+
+  /* 去掉浮点尾巴：0.30000000000000004 -> 0.3 */
+  function fmt(n) {
+    if (!isFinite(n)) { return "—"; }
+    var r = Math.round(n * 1e10) / 1e10;
+    if (Object.is(r, -0)) { r = 0; }
+    return String(r);
+  }
+
+  /* 常用根写成精确形式，便于核对 */
+  function pretty(n) {
+    var r = Math.round(n * 1e10) / 1e10;
+    if (Number.isInteger(r)) { return String(r); }
+    return fmt(r);
+  }
+
+  function setBadge(text, kind) {
+    badge.textContent = text;
+    badge.className = "badge" + (kind ? " " + kind : "");
+  }
+
+  function clearInvalid() {
+    Object.keys(inputs).forEach(function (k) {
+      inputs[k].classList.remove("invalid");
+    });
+  }
+
+  function solve() {
+    clearInvalid();
+
+    var a = parseFloat(inputs.a.value);
+    var b = parseFloat(inputs.b.value);
+    var c = parseFloat(inputs.c.value);
+
+    // 空值或非数字
+    var bad = [];
+    if (!isFinite(a)) { bad.push("a"); }
+    if (!isFinite(b)) { bad.push("b"); }
+    if (!isFinite(c)) { bad.push("c"); }
+    if (bad.length) {
+      bad.forEach(function (k) { inputs[k].classList.add("invalid"); });
+      setBadge("输入无效", "err");
+      out.innerHTML = '<p class="empty">a、b、c 都得填数字，空着或写成文字都算不出来。</p>';
+      return;
+    }
+
+    // a = 0 退化成一元一次方程
+    if (a === 0) {
+      if (b === 0) {
+        setBadge("无解 / 恒等", "err");
+        out.innerHTML =
+          '<div class="steps"><b>a = 0 且 b = 0</b>\n' +
+          (c === 0 ? "任意 x 都满足，方程恒成立。" : "等式不成立，方程无解。") +
+          "</div>";
+        return;
+      }
+      var x = -c / b;
+      setBadge("一次方程", "warn");
+      out.innerHTML =
+        '<div class="roots">' +
+          '<div class="root"><div class="root-k">X</div><div class="root-v">' + pretty(x) + "</div></div>" +
+        "</div>" +
+        '<div class="steps">a = 0，退化为 <b>' + pretty(b) + "x " +
+        (c < 0 ? "− " + pretty(Math.abs(c)) : "+ " + pretty(c)) + " = 0</b>\n" +
+        "x = -c / b = " + pretty(-c) + " / " + pretty(b) + ' = <span class="hl">' + pretty(x) + "</span></div>";
+      return;
+    }
+
+    var delta = b * b - 4 * a * c;
+    var head =
+      "<b>Δ = b² − 4ac</b>\n" +
+      "  = (" + pretty(b) + ")² − 4 × " + pretty(a) + " × " + pretty(c) + "\n" +
+      "  = " + pretty(b * b) + " − " + pretty(4 * a * c) + "\n" +
+      "  = " + pretty(delta) + "\n\n";
+
+    if (delta > 0) {
+      var sq = Math.sqrt(delta);
+      var x1 = (-b + sq) / (2 * a);
+      var x2 = (-b - sq) / (2 * a);
+      setBadge("两个不等实根 · Δ > 0", "ok");
+      out.innerHTML =
+        '<div class="roots">' +
+          '<div class="root"><div class="root-k">X₁</div><div class="root-v">' + pretty(x1) + "</div></div>" +
+          '<div class="root"><div class="root-k">X₂</div><div class="root-v">' + pretty(x2) + "</div></div>" +
+        "</div>" +
+        '<div class="steps">' + head +
+        "√Δ = " + pretty(sq) + "\n" +
+        'x = (−b ± √Δ) / 2a = (' + pretty(-b) + " ± " + pretty(sq) + ") / " + pretty(2 * a) + "\n" +
+        'x₁ = <span class="hl">' + pretty(x1) + '</span>　x₂ = <span class="hl">' + pretty(x2) + "</span></div>";
+      return;
+    }
+
+    if (delta === 0) {
+      var x0 = -b / (2 * a);
+      setBadge("两个相等实根 · Δ = 0", "ok");
+      out.innerHTML =
+        '<div class="roots">' +
+          '<div class="root"><div class="root-k">X₁ = X₂</div><div class="root-v">' + pretty(x0) + "</div></div>" +
+        "</div>" +
+        '<div class="steps">' + head +
+        "Δ = 0，两根重合：\n" +
+        'x = −b / 2a = ' + pretty(-b) + " / " + pretty(2 * a) + ' = <span class="hl">' + pretty(x0) + "</span></div>";
+      return;
+    }
+
+    // Δ < 0：共轭复根
+    var re = -b / (2 * a);
+    var im = Math.sqrt(-delta) / (2 * a);
+    var imAbs = Math.abs(im);
+    setBadge("一对共轭复根 · Δ < 0", "warn");
+    out.innerHTML =
+      '<div class="roots">' +
+        '<div class="root"><div class="root-k">X₁</div><div class="root-v">' + pretty(re) +
+          ' <small>+</small> ' + pretty(imAbs) + "<small>i</small></div></div>" +
+        '<div class="root"><div class="root-k">X₂</div><div class="root-v">' + pretty(re) +
+          ' <small>−</small> ' + pretty(imAbs) + "<small>i</small></div></div>" +
+      "</div>" +
+      '<div class="steps">' + head +
+      "Δ < 0，实数范围无解，取复数根：\n" +
+      "实部 = −b / 2a = " + pretty(re) + "\n" +
+      "虚部 = √(−Δ) / 2a = " + pretty(imAbs) + "\n" +
+      'x = <span class="hl">' + pretty(re) + " ± " + pretty(imAbs) + "i</span></div>";
+  }
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    solve();
+  });
+
+  Object.keys(inputs).forEach(function (k) {
+    inputs[k].addEventListener("input", function () {
+      inputs[k].classList.remove("invalid");
+      if (inputs.a.value !== "" && inputs.b.value !== "" && inputs.c.value !== "") {
+        solve();
+      }
+    });
+  });
+
+  document.getElementById("clear").addEventListener("click", function () {
+    Object.keys(inputs).forEach(function (k) {
+      inputs[k].value = "";
+      inputs[k].classList.remove("invalid");
+    });
+    inputs.a.focus();
+    setBadge("等待输入");
+    out.innerHTML = '<p class="empty">填好系数后点「求解」，这里会显示判别式与两个根。</p>';
+  });
+
+  document.getElementById("sample").addEventListener("click", function () {
+    sampleIdx = (sampleIdx + 1) % samples.length;
+    var s = samples[sampleIdx];
+    inputs.a.value = s.a;
+    inputs.b.value = s.b;
+    inputs.c.value = s.c;
+    solve();
+  });
+
+  solve();
+})();
+</script>
 </body>
 </html>

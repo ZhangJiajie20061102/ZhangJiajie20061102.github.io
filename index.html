@@ -1,65 +1,1064 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <title>3D CSS Cube</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zhang Jiajie · 作品集</title>
+<meta name="description" content="Zhang Jiajie 的项目作品集：微信小程序进销存、多线程 socket 聊天、3D 汉诺塔、Java Servlet 签到系统，以及经营数据分析。">
+<meta name="author" content="Zhang Jiajie">
+<meta name="theme-color" content="#08090b">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Zhang Jiajie · 作品集">
+<meta property="og:description" content="从 socket 协议到云开发小程序，从算法游戏到经营数据看板。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2308090b'/%3E%3Cpath d='M9 9h14v4H9zm0 10h14v4H9z' fill='%23ff5c35'/%3E%3C/svg%3E">
+<style>
+  :root{
+    --bg:#08090b;
+    --surface:#101217;
+    --surface-2:#15181e;
+    --line:#1f232b;
+    --line-soft:#171a20;
+    --text:#eceef2;
+    --muted:#8b9099;
+    --faint:#5c626c;
+    --accent:#ff5c35;
+    --accent-dim:rgba(255,92,53,.14);
+    --radius:16px;
+    --max:1080px;
+    --ease:cubic-bezier(.16,1,.3,1);
+  }
 
-        body {
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: #f0f0f0;
-        }
+  *,*::before,*::after{box-sizing:border-box}
 
-        .cube {
-            position: relative;
-            width: 200px;
-            height: 200px;
-            transform-style: flat;
-        }
+  html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
 
-        /* Front Face */
-        .cube__face--front {
-            position: absolute;
-            width: 200px;
-            height: 200px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            transform: translate(0, 0);
-        }
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    font-size:16px;
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+    overflow-x:hidden;
+  }
 
-        /* Top Face */
-        .cube__face--top {
-            position: absolute;
-            width: 200px;
-            height: 200px;
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            transform: translate(0, -100%) skewX(-45deg);
-            transform-origin: bottom left;
-        }
+  a{color:inherit;text-decoration:none}
+  img{max-width:100%;display:block}
 
-        /* Right Face */
-        .cube__face--right {
-            position: absolute;
-            width: 200px;
-            height: 200px;
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            transform: translate(100%, 0) skewY(-45deg);
-            transform-origin: top left;
-        }
-    </style>
+  ::selection{background:var(--accent);color:#0a0a0a}
+
+  .wrap{
+    max-width:var(--max);
+    margin:0 auto;
+    padding:0 24px;
+  }
+
+  /* ---------- 顶栏 ---------- */
+  .nav{
+    position:fixed;
+    inset:0 0 auto 0;
+    z-index:50;
+    transition:background .3s var(--ease),border-color .3s var(--ease);
+    border-bottom:1px solid transparent;
+  }
+  .nav.scrolled{
+    background:rgba(8,9,11,.78);
+    backdrop-filter:saturate(160%) blur(14px);
+    -webkit-backdrop-filter:saturate(160%) blur(14px);
+    border-bottom-color:var(--line-soft);
+  }
+  .nav-inner{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    height:64px;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-weight:600;
+    letter-spacing:-.01em;
+    font-size:15px;
+  }
+  .brand-mark{
+    width:26px;height:26px;
+    border-radius:7px;
+    background:linear-gradient(145deg,#2a2f38,#14171c);
+    border:1px solid var(--line);
+    display:grid;place-items:center;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:11px;
+    color:var(--accent);
+  }
+  .nav-links{
+    display:flex;
+    align-items:center;
+    gap:28px;
+  }
+  .nav-links a{
+    font-size:14px;
+    color:var(--muted);
+    transition:color .2s;
+  }
+  .nav-links a:hover{color:var(--text)}
+  .nav-cta{
+    padding:7px 14px;
+    border:1px solid var(--line);
+    border-radius:999px;
+    font-size:13.5px;
+    color:var(--text)!important;
+    transition:border-color .2s,background .2s;
+  }
+  .nav-cta:hover{border-color:#3a4049;background:var(--surface)}
+  @media (max-width:640px){
+    .nav-links{gap:16px}
+    .nav-links a:not(.nav-cta){display:none}
+  }
+
+  /* ---------- Hero ---------- */
+  .hero{
+    position:relative;
+    padding:152px 0 88px;
+    overflow:hidden;
+  }
+  .hero::before{
+    content:"";
+    position:absolute;
+    top:-320px;left:50%;
+    width:1000px;height:760px;
+    transform:translateX(-50%);
+    background:radial-gradient(ellipse at center,rgba(255,92,53,.13),rgba(255,92,53,.04) 42%,transparent 68%);
+    pointer-events:none;
+  }
+  .hero::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background-image:linear-gradient(var(--line-soft) 1px,transparent 1px),linear-gradient(90deg,var(--line-soft) 1px,transparent 1px);
+    background-size:72px 72px;
+    mask-image:radial-gradient(ellipse 70% 55% at 50% 30%,#000 20%,transparent 72%);
+    -webkit-mask-image:radial-gradient(ellipse 70% 55% at 50% 30%,#000 20%,transparent 72%);
+    opacity:.5;
+    pointer-events:none;
+  }
+  .hero .wrap{position:relative;z-index:1}
+
+  .kicker{
+    display:inline-flex;
+    align-items:center;
+    gap:9px;
+    font-size:13px;
+    color:var(--muted);
+    letter-spacing:.02em;
+    padding:6px 13px 6px 10px;
+    border:1px solid var(--line);
+    border-radius:999px;
+    background:var(--surface);
+    margin-bottom:28px;
+  }
+  .dot{
+    width:6px;height:6px;border-radius:50%;
+    background:#43d17f;
+    box-shadow:0 0 0 3px rgba(67,209,127,.16);
+    animation:pulse 2.6s ease-in-out infinite;
+  }
+  @keyframes pulse{
+    0%,100%{opacity:1}
+    50%{opacity:.45}
+  }
+
+  h1{
+    margin:0 0 22px;
+    font-size:clamp(42px,7.2vw,82px);
+    line-height:1.03;
+    letter-spacing:-.035em;
+    font-weight:600;
+  }
+  h1 .thin{color:var(--faint)}
+  h1 .accent{
+    background:linear-gradient(92deg,#ff8a5c,#ff5c35 55%,#e0431f);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+
+  .lede{
+    max-width:620px;
+    font-size:clamp(16px,1.6vw,18.5px);
+    color:var(--muted);
+    line-height:1.72;
+    margin:0 0 36px;
+  }
+  .lede strong{color:var(--text);font-weight:500}
+
+  .actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+    margin-bottom:64px;
+  }
+  .btn{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:12px 22px;
+    border-radius:10px;
+    font-size:14.5px;
+    font-weight:500;
+    transition:transform .2s var(--ease),background .2s,border-color .2s,box-shadow .2s;
+    cursor:pointer;
+  }
+  .btn-primary{
+    background:var(--accent);
+    color:#120703;
+    box-shadow:0 6px 24px -8px rgba(255,92,53,.6);
+  }
+  .btn-primary:hover{transform:translateY(-1px);box-shadow:0 10px 28px -8px rgba(255,92,53,.7)}
+  .btn-ghost{
+    border:1px solid var(--line);
+    color:var(--text);
+    background:var(--surface);
+  }
+  .btn-ghost:hover{border-color:#3a4049;background:var(--surface-2);transform:translateY(-1px)}
+  .btn svg{width:15px;height:15px;flex:none}
+
+  .stats{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:1px;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    background:var(--line);
+    overflow:hidden;
+  }
+  .stat{
+    background:var(--bg);
+    padding:22px 22px 20px;
+  }
+  .stat-num{
+    font-size:clamp(22px,2.6vw,30px);
+    font-weight:600;
+    letter-spacing:-.03em;
+    line-height:1.1;
+    font-variant-numeric:tabular-nums;
+  }
+  .stat-num small{font-size:.55em;font-weight:500;color:var(--muted);margin-left:3px}
+  .stat-label{
+    margin-top:6px;
+    font-size:12.5px;
+    color:var(--faint);
+    letter-spacing:.01em;
+  }
+  @media (max-width:700px){
+    .stats{grid-template-columns:repeat(2,1fr)}
+    .hero{padding:120px 0 64px}
+  }
+
+  /* ---------- 通用段落 ---------- */
+  section{position:relative}
+  .sec{padding:88px 0}
+  .sec-head{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:24px;
+    flex-wrap:wrap;
+    margin-bottom:40px;
+  }
+  .sec-tag{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:12px;
+    color:var(--accent);
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    margin-bottom:12px;
+  }
+  h2{
+    margin:0;
+    font-size:clamp(26px,3.4vw,36px);
+    letter-spacing:-.028em;
+    font-weight:600;
+    line-height:1.2;
+  }
+  .sec-sub{
+    margin:10px 0 0;
+    color:var(--muted);
+    font-size:15px;
+    max-width:520px;
+  }
+
+  /* ---------- 筛选 ---------- */
+  .filters{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .chip{
+    padding:7px 14px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    background:transparent;
+    color:var(--muted);
+    font:inherit;
+    font-size:13px;
+    cursor:pointer;
+    transition:all .2s var(--ease);
+  }
+  .chip:hover{color:var(--text);border-color:#333943}
+  .chip[aria-pressed="true"]{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#120703;
+    font-weight:500;
+  }
+
+  /* ---------- 项目卡 ---------- */
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:20px;
+  }
+  @media (max-width:820px){
+    .grid{grid-template-columns:1fr}
+  }
+
+  .card{
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    background:var(--surface);
+    overflow:hidden;
+    transition:transform .35s var(--ease),border-color .35s,box-shadow .35s;
+  }
+  .card:hover{
+    transform:translateY(-4px);
+    border-color:#333943;
+    box-shadow:0 24px 48px -24px rgba(0,0,0,.9);
+  }
+  .card.is-hidden{display:none}
+
+  .thumb{
+    position:relative;
+    height:158px;
+    overflow:hidden;
+    border-bottom:1px solid var(--line-soft);
+    background:#0c0e12;
+    isolation:isolate;
+  }
+  .thumb::before{
+    content:"";
+    position:absolute;inset:0;
+    background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);
+    background-size:26px 26px;
+    opacity:.55;
+  }
+  .thumb::after{
+    content:"";
+    position:absolute;inset:0;
+    background:var(--glow);
+    transition:transform .6s var(--ease),opacity .4s;
+    z-index:-1;
+  }
+  .card:hover .thumb::after{transform:scale(1.12);opacity:1}
+
+  .thumb-num{
+    position:absolute;
+    right:18px;bottom:-14px;
+    font-size:96px;
+    font-weight:700;
+    letter-spacing:-.06em;
+    line-height:1;
+    color:transparent;
+    -webkit-text-stroke:1px rgba(255,255,255,.14);
+    user-select:none;
+  }
+  .thumb-badge{
+    position:absolute;
+    top:16px;left:16px;
+    padding:4px 10px;
+    border-radius:999px;
+    font-size:11.5px;
+    letter-spacing:.04em;
+    background:rgba(8,9,11,.66);
+    border:1px solid rgba(255,255,255,.12);
+    backdrop-filter:blur(8px);
+    color:#e6e8ec;
+  }
+  .thumb-badge.live::before{
+    content:"";
+    display:inline-block;
+    width:5px;height:5px;border-radius:50%;
+    background:#43d17f;
+    margin-right:6px;
+    vertical-align:middle;
+  }
+
+  .card-body{
+    padding:22px 22px 20px;
+    display:flex;
+    flex-direction:column;
+    flex:1;
+  }
+  .card-title{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:8px;
+  }
+  .card-title h3{
+    margin:0;
+    font-size:17.5px;
+    font-weight:600;
+    letter-spacing:-.015em;
+  }
+  .card-arrow{
+    color:var(--faint);
+    transition:transform .25s var(--ease),color .25s;
+    flex:none;
+  }
+  .card:hover .card-arrow{color:var(--accent);transform:translate(2px,-2px)}
+  .card-desc{
+    margin:0 0 18px;
+    color:var(--muted);
+    font-size:14px;
+    line-height:1.68;
+  }
+  .card-desc em{
+    font-style:normal;
+    color:#c8ccd4;
+  }
+  .tags{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    margin-top:auto;
+  }
+  .tag{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:11.5px;
+    color:var(--faint);
+    padding:3px 8px;
+    border:1px solid var(--line-soft);
+    border-radius:5px;
+    background:rgba(255,255,255,.02);
+  }
+  .card-links{
+    display:flex;
+    gap:16px;
+    margin-top:16px;
+    padding-top:16px;
+    border-top:1px solid var(--line-soft);
+    font-size:13px;
+  }
+  .card-links a{
+    color:var(--muted);
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    transition:color .2s;
+  }
+  .card-links a:hover{color:var(--accent)}
+  .card-links a svg{width:13px;height:13px;opacity:.8}
+
+  /* ---------- 能力 ---------- */
+  .caps{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:20px;
+  }
+  @media (max-width:820px){.caps{grid-template-columns:1fr}}
+
+  .cap{
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:26px 24px;
+    background:linear-gradient(180deg,var(--surface),rgba(16,18,23,.4));
+  }
+  .cap-icon{
+    width:34px;height:34px;
+    border-radius:9px;
+    display:grid;place-items:center;
+    background:var(--accent-dim);
+    border:1px solid rgba(255,92,53,.22);
+    margin-bottom:16px;
+    color:var(--accent);
+  }
+  .cap-icon svg{width:17px;height:17px}
+  .cap h3{
+    margin:0 0 10px;
+    font-size:16px;
+    font-weight:600;
+    letter-spacing:-.01em;
+  }
+  .cap ul{
+    margin:0;
+    padding:0;
+    list-style:none;
+    font-size:13.8px;
+    color:var(--muted);
+    line-height:1.85;
+  }
+  .cap li{position:relative;padding-left:15px}
+  .cap li::before{
+    content:"";
+    position:absolute;
+    left:0;top:.78em;
+    width:5px;height:1px;
+    background:var(--faint);
+  }
+
+  /* ---------- 关于 ---------- */
+  .about{
+    display:grid;
+    grid-template-columns:1.15fr .85fr;
+    gap:56px;
+    align-items:start;
+  }
+  @media (max-width:820px){.about{grid-template-columns:1fr;gap:36px}}
+  .about p{
+    margin:0 0 16px;
+    color:var(--muted);
+    font-size:15px;
+    line-height:1.8;
+  }
+  .about p:last-child{margin-bottom:0}
+  .about strong{color:var(--text);font-weight:500}
+  .about code{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:.9em;
+    color:#c8ccd4;
+    background:#15181e;
+    padding:1px 5px;
+    border-radius:4px;
+  }
+
+  .now{
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:24px;
+    background:var(--surface);
+  }
+  .now-title{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:11.5px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--faint);
+    margin-bottom:16px;
+  }
+  .now-item{
+    display:flex;
+    gap:12px;
+    padding:11px 0;
+    border-bottom:1px dashed var(--line-soft);
+    font-size:14px;
+  }
+  .now-item:last-child{border-bottom:0;padding-bottom:0}
+  .now-item span:first-child{
+    color:var(--accent);
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:12px;
+    padding-top:2px;
+  }
+  .now-item span:last-child{color:#c2c6ce}
+  .now-item em{color:var(--faint);font-style:normal}
+
+  /* ---------- 页脚 ---------- */
+  footer{
+    border-top:1px solid var(--line-soft);
+    padding:40px 0 56px;
+    margin-top:24px;
+  }
+  .foot{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:20px;
+    flex-wrap:wrap;
+    font-size:13px;
+    color:var(--faint);
+  }
+  .foot-links{display:flex;gap:20px}
+  .foot-links a{color:var(--muted);transition:color .2s}
+  .foot-links a:hover{color:var(--accent)}
+
+  /* ---------- 入场动画 ---------- */
+  .reveal{
+    opacity:0;
+    transform:translateY(18px);
+  }
+  .reveal.in{
+    opacity:1;
+    transform:none;
+    transition:opacity .8s var(--ease),transform .8s var(--ease);
+  }
+  @media (prefers-reduced-motion:reduce){
+    .reveal{opacity:1;transform:none}
+    html{scroll-behavior:auto}
+    *{animation:none!important;transition:none!important}
+  }
+
+  a:focus-visible,button:focus-visible{
+    outline:2px solid var(--accent);
+    outline-offset:3px;
+    border-radius:6px;
+  }
+</style>
 </head>
 <body>
-    <div class="cube">
-        <div class="cube__face--front"></div>
-        <div class="cube__face--top"></div>
-        <div class="cube__face--right"></div>
+
+<header class="nav" id="nav">
+  <div class="wrap nav-inner">
+    <a class="brand" href="#top">
+      <span class="brand-mark">ZJ</span>
+      <span>Zhang Jiajie</span>
+    </a>
+    <nav class="nav-links">
+      <a href="#work">项目</a>
+      <a href="#stack">能力</a>
+      <a href="#about">关于</a>
+      <a class="nav-cta" href="https://github.com/ZhangJiajie20061102" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="wrap">
+      <div class="kicker"><span class="dot"></span>正在做：把进销存小程序做成开源模板</div>
+
+      <h1>
+        写真正<br>
+        <span class="accent">能跑起来</span><span class="thin">的东西</span>
+      </h1>
+
+      <p class="lede">
+        从 socket 协议的粘包处理，到微信云开发的进销存系统；从递归算法驱动的 3D 小游戏，
+        到部署在容器里的 Java 服务。<strong>六个公开仓库，每一个都跑通过。</strong>
+      </p>
+
+      <div class="actions">
+        <a class="btn btn-primary" href="#work">
+          查看项目
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <a class="btn btn-ghost" href="https://github.com/ZhangJiajie20061102" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2.2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.9 4.4 19 4.7 19 4.7c.6 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3z"/></svg>
+          GitHub 主页
+        </a>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-num">6</div>
+          <div class="stat-label">公开仓库</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">76<small>项</small></div>
+          <div class="stat-label">自动化测试</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">3<small>套</small></div>
+          <div class="stat-label">完整应用</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">2<small>个</small></div>
+          <div class="stat-label">在线可访问</div>
+        </div>
+      </div>
     </div>
+  </section>
+
+  <!-- 项目 -->
+  <section class="sec" id="work">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div>
+          <div class="sec-tag">Selected Work</div>
+          <h2>项目</h2>
+          <p class="sec-sub">六个仓库，从课程练习长成完整应用。点开任何一个都能跑。</p>
+        </div>
+        <div class="filters" role="group" aria-label="按技术栈筛选项目">
+          <button class="chip" data-filter="all" aria-pressed="true">全部</button>
+          <button class="chip" data-filter="mp" aria-pressed="false">小程序</button>
+          <button class="chip" data-filter="py" aria-pressed="false">Python</button>
+          <button class="chip" data-filter="java" aria-pressed="false">Java</button>
+          <button class="chip" data-filter="web" aria-pressed="false">前端</button>
+          <button class="chip" data-filter="data" aria-pressed="false">数据</button>
+        </div>
+      </div>
+
+      <div class="grid" id="grid">
+
+        <!-- 01 店员助手 -->
+        <article class="card reveal" data-cat="mp">
+          <div class="thumb" style="--glow:radial-gradient(circle at 78% 18%,rgba(255,92,53,.30),transparent 62%)">
+            <span class="thumb-badge">微信小程序</span>
+            <span class="thumb-num">01</span>
+          </div>
+          <div class="card-body">
+            <div class="card-title">
+              <h3>店员助手 · 进销存小程序</h3>
+              <span class="card-arrow" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
+              </span>
+            </div>
+            <p class="card-desc">
+              给夫妻小店用的库存与流水管理。七个小程序页面 + 云开发数据库，
+              <em>进货按移动加权平均更新成本</em>，条件更新防超卖，删商品前先校验库存。
+            </p>
+            <div class="tags">
+              <span class="tag">WeChat</span>
+              <span class="tag">云开发</span>
+              <span class="tag">JavaScript</span>
+              <span class="tag">Vant</span>
+              <span class="tag">ECharts</span>
+            </div>
+            <div class="card-links">
+              <a href="https://github.com/ZhangJiajie20061102/shop-assistant-miniprogram" target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2.2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.9 4.4 19 4.7 19 4.7c.6 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3z"/></svg>
+                源码
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <!-- 02 qq-chat-demo -->
+        <article class="card reveal" data-cat="py">
+          <div class="thumb" style="--glow:radial-gradient(circle at 22% 80%,rgba(78,140,255,.30),transparent 62%)">
+            <span class="thumb-badge live">76 项测试</span>
+            <span class="thumb-num">02</span>
+          </div>
+          <div class="card-body">
+            <div class="card-title">
+              <h3>qq-chat-demo · 多线程聊天程序</h3>
+              <span class="card-arrow" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
+              </span>
+            </div>
+            <p class="card-desc">
+              仿 QQ 的服务端 / 客户端。原始写法用两次 <em>sendall / recv</em> 会粘包，实测 20 次只对 2 次，
+              改成 JSON + 换行分帧后彻底解决，并补了 35 项协议测试与 41 项界面测试。
+            </p>
+            <div class="tags">
+              <span class="tag">Python</span>
+              <span class="tag">socket</span>
+              <span class="tag">多线程</span>
+              <span class="tag">tkinter</span>
+              <span class="tag">SQLite</span>
+              <span class="tag">unittest</span>
+            </div>
+            <div class="card-links">
+              <a href="https://github.com/ZhangJiajie20061102/qq-chat-demo" target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2.2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.9 4.4 19 4.7 19 4.7c.6 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3z"/></svg>
+                源码
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <!-- 03 汉诺塔 -->
+        <article class="card reveal" data-cat="web">
+          <div class="thumb" style="--glow:radial-gradient(circle at 50% 0%,rgba(150,110,255,.32),transparent 60%)">
+            <span class="thumb-badge live">在线可玩</span>
+            <span class="thumb-num">03</span>
+          </div>
+          <div class="card-body">
+            <div class="card-title">
+              <h3>3D 汉诺塔</h3>
+              <span class="card-arrow" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
+              </span>
+            </div>
+            <p class="card-desc">
+              星空背景的 3D 汉诺塔，纯原生 DOM + CSS 透视，零第三方库。
+              递归算法生成最优解并分步动画演示，支持暂停继续、合法校验、2–10 层调节。
+            </p>
+            <div class="tags">
+              <span class="tag">HTML5</span>
+              <span class="tag">CSS 3D</span>
+              <span class="tag">JavaScript</span>
+              <span class="tag">递归</span>
+            </div>
+            <div class="card-links">
+              <a href="https://zhangjiajie20061102.github.io/hanoi-3d-game/" target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l14 9-14 9z"/></svg>
+                在线试玩
+              </a>
+              <a href="https://github.com/ZhangJiajie20061102/hanoi-3d-game" target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2.2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.9 4.4 19 4.7 19 4.7c.6 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3z"/></svg>
+                源码
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <!-- 04 attendance -->
+        <article class="card reveal" data-cat="java">
+          <div class="thumb" style="--glow:radial-gradient(circle at 80% 85%,rgba(67,209,127,.26),transparent 62%)">
+            <span class="thumb-badge live">已部署上线</span>
+            <span class="thumb-num">04</span>
+          </div>
+          <div class="card-body">
+            <div class="card-title">
+              <h3>attendance · 按座位号签到</h3>
+              <span class="card-arrow" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
+              </span>
+            </div>
+            <p class="card-desc">
+              不套框架的 Java Web：原生 Servlet + 内存态 HashMap 记录学号与座位，
+              NetBeans / Ant 构建成 war，打进 Tomcat 9 的 Docker 镜像部署到 Render。
+            </p>
+            <div class="tags">
+              <span class="tag">Java 11</span>
+              <span class="tag">Servlet</span>
+              <span class="tag">Tomcat</span>
+              <span class="tag">Docker</span>
+              <span class="tag">Render</span>
+            </div>
+            <div class="card-links">
+              <a href="https://attend95712.onrender.com/" target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l14 9-14 9z"/></svg>
+                在线访问
+              </a>
+              <a href="https://github.com/ZhangJiajie20061102/attendance" target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2.2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.9 4.4 19 4.7 19 4.7c.6 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3z"/></svg>
+                源码
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <!-- 05 经营看板 -->
+        <article class="card reveal" data-cat="data">
+          <div class="thumb" style="--glow:radial-gradient(circle at 50% 100%,rgba(255,196,60,.26),transparent 62%)">
+            <span class="thumb-badge">进行中</span>
+            <span class="thumb-num">05</span>
+          </div>
+          <div class="card-body">
+            <div class="card-title">
+              <h3>经营看板 · Power BI 数据模型</h3>
+              <span class="card-arrow" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
+              </span>
+            </div>
+            <p class="card-desc">
+              把进销存的流水变成可读的经营指标：<em>星级模型 + 日期表 + DAX 度量值</em>，
+              含销售额趋势、品类占比、毛利排行、库存预警，附造数脚本与 JSON 转 CSV 工具。
+            </p>
+            <div class="tags">
+              <span class="tag">Power BI</span>
+              <span class="tag">DAX</span>
+              <span class="tag">Python</span>
+              <span class="tag">数据建模</span>
+            </div>
+            <div class="card-links">
+              <span style="color:var(--faint)">模型与度量值已就绪，待发布模板</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- 06 一元二次 -->
+        <article class="card reveal" data-cat="web">
+          <div class="thumb" style="--glow:radial-gradient(circle at 20% 20%,rgba(90,200,250,.24),transparent 60%)">
+            <span class="thumb-badge live">在线可用</span>
+            <span class="thumb-num">06</span>
+          </div>
+          <div class="card-body">
+            <div class="card-title">
+              <h3>一元二次方程求解器</h3>
+              <span class="card-arrow" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
+              </span>
+            </div>
+            <p class="card-desc">
+              输入 a、b、c 直接出根，判别式分支处理实根、重根与复数根。
+              留在这个站里的最小工具，也是最早写的那批页面之一。
+            </p>
+            <div class="tags">
+              <span class="tag">HTML</span>
+              <span class="tag">JavaScript</span>
+            </div>
+            <div class="card-links">
+              <a href="solve.html">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l14 9-14 9z"/></svg>
+                打开
+              </a>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 能力 -->
+  <section class="sec" id="stack" style="padding-top:24px">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div>
+          <div class="sec-tag">What I Actually Do</div>
+          <h2>手上这几套东西</h2>
+          <p class="sec-sub">不是技能清单，是这六个项目里真写过、调通过的部分。</p>
+        </div>
+      </div>
+
+      <div class="caps">
+        <div class="cap reveal">
+          <div class="cap-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M3 10h18M8 15h3"/></svg>
+          </div>
+          <h3>小程序与云开发</h3>
+          <ul>
+            <li>集合结构与字段设计（product / purchase / sale）</li>
+            <li>用条件更新实现原子扣减，避免超卖</li>
+            <li>tabBar 多页导航与页面间状态传递</li>
+            <li>ECharts 趋势图与排行视图</li>
+          </ul>
+        </div>
+
+        <div class="cap reveal">
+          <div class="cap-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M5 8l7-5 7 5M5 16l7 5 7-5"/></svg>
+          </div>
+          <h3>后端与协议</h3>
+          <ul>
+            <li>socket 分帧设计，解决 TCP 粘包</li>
+            <li>多线程共享状态加锁、队列解耦 UI</li>
+            <li>Servlet 生命周期与内存态存储</li>
+            <li>war → Docker → 容器平台部署</li>
+          </ul>
+        </div>
+
+        <div class="cap reveal">
+          <div class="cap-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5M4 19h16"/><path d="M8 15l4-5 3 3 4-6"/></svg>
+          </div>
+          <h3>数据与可视化</h3>
+          <ul>
+            <li>移动加权平均成本，失败回滚两项</li>
+            <li>星级模型 + 日期表，DAX 度量值</li>
+            <li>毛利率、库存周转、断货预警</li>
+            <li>用造数脚本造出接近真实分布的数据</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 关于 -->
+  <section class="sec" id="about">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div>
+          <div class="sec-tag">About</div>
+          <h2>关于</h2>
+        </div>
+      </div>
+
+      <div class="about reveal">
+        <div>
+          <p>
+            我习惯从<strong>一个具体的麻烦</strong>开始写代码：小店的账记不清，就做一个进销存；
+            课本上的 socket 例子一跑就乱码，就把粘包问题查到底；想复习递归，就做成能玩的 3D 汉诺塔。
+          </p>
+          <p>
+            所以这几个仓库的完成度不太一样，但共同点是<strong>都跑通过、都被人真用过</strong>。
+            <code>my-website</code> 是最早那张网页，留在那儿当起点；后来写的东西，一个个把当初的坑填上了。
+          </p>
+          <p>
+            技术上偏工程一侧：更在意「这个数算得对不对」「失败了会不会回滚」，
+            而不是「页面好不好看」。不过看板做多了，多少也开始在意了。
+          </p>
+        </div>
+
+        <div class="now">
+          <div class="now-title">Now</div>
+          <div class="now-item"><span>01</span><span>把进销存改成 clone 下来填个环境 ID 就能跑的<em>开源模板</em></span></div>
+          <div class="now-item"><span>02</span><span>给 <em>qq-chat-demo</em> 加 GitHub Actions，把 76 项测试挂上去</span></div>
+          <div class="now-item"><span>03</span><span>整理一套小店经营分析的 <em>BI 模板</em></span></div>
+          <div class="now-item"><span>04</span><span>学 Java Web 的下一步：把内存态换成真正的数据库</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <span>© <span id="year">2026</span> Zhang Jiajie · 原生 HTML 手写，无框架无依赖</span>
+    <div class="foot-links">
+      <a href="https://github.com/ZhangJiajie20061102" target="_blank" rel="noopener">GitHub</a>
+      <a href="#work">项目</a>
+      <a href="archive/index-2026-04-original.html">旧版首页</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  /* 顶栏滚动态 */
+  var nav = document.getElementById("nav");
+  var onScroll = function () {
+    nav.classList.toggle("scrolled", window.scrollY > 8);
+  };
+  onScroll();
+  window.addEventListener("scroll", onScroll, { passive: true });
+
+  /* 年份 */
+  document.getElementById("year").textContent = new Date().getFullYear();
+
+  /* 进场动画 */
+  var items = Array.prototype.slice.call(document.querySelectorAll(".reveal"));
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (!reduce && "IntersectionObserver" in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) { return; }
+        var el = e.target;
+        var siblings = Array.prototype.slice.call(el.parentNode.children);
+        var i = siblings.indexOf(el);
+        el.style.transitionDelay = Math.min(i, 5) * 70 + "ms";
+        el.classList.add("in");
+        io.unobserve(el);
+      });
+    }, { rootMargin: "0px 0px -12% 0px", threshold: 0.08 });
+    items.forEach(function (el) { io.observe(el); });
+  } else {
+    items.forEach(function (el) { el.classList.add("in"); });
+  }
+
+  /* 项目筛选 */
+  var chips = Array.prototype.slice.call(document.querySelectorAll(".chip"));
+  var cards = Array.prototype.slice.call(document.querySelectorAll("#grid .card"));
+
+  chips.forEach(function (chip) {
+    chip.addEventListener("click", function () {
+      var key = chip.dataset.filter;
+      chips.forEach(function (c) {
+        c.setAttribute("aria-pressed", String(c === chip));
+      });
+      cards.forEach(function (card) {
+        var show = key === "all" || card.dataset.cat === key;
+        card.classList.toggle("is-hidden", !show);
+        if (show) { card.classList.add("in"); }
+      });
+    });
+  });
+})();
+</script>
 </body>
 </html>
