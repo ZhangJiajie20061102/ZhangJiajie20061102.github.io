@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab · 在线小工具</title>
+<meta name="description" content="三个打开就能用的小工具：打字速度测试、2048、迷宫生成与寻路。纯前端零依赖。">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230a0a0b'/%3E%3Ctext x='16' y='22' font-size='14' fill='%23d4af57' text-anchor='middle' font-family='monospace'%3EL%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <a class="brand" href="../index.html">
+      <span class="brand-mark">L</span>
+      <span class="brand-name"><b>Lab</b> · online tools</span>
+    </a>
+    <nav>
+      <a href="../index.html">← 作品集</a>
+      <a href="https://github.com/ZhangJiajie20061102" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+
+  <div class="eyebrow">small tools, no build step</div>
+  <h1>三个<em>打开就能用</em>的东西</h1>
+  <p class="lede">
+    没有登录、没有后端、没有 npm install。纯 HTML + CSS + 原生 JavaScript，
+    刷新即重置，数据只存在你自己的浏览器里。
+  </p>
+
+  <div class="grid">
+
+    <a class="card" href="typing.html">
+      <h2>打字速度测试</h2>
+      <p>逐字符判定对错，实时算 WPM 与准确率，60 秒一局，最高分留在本地。</p>
+      <div class="meta"><span>WPM</span><span>键位判定</span><span>localStorage</span></div>
+      <div class="go">开始测速 →</div>
+    </a>
+
+    <a class="card" href="2048.html">
+      <h2>2048</h2>
+      <p>经典合并玩法。方向键或手指滑动，支持一步撤销，最高分自动保存。</p>
+      <div class="meta"><span>状态机</span><span>触屏手势</span><span>撤销</span></div>
+      <div class="go">开始游戏 →</div>
+    </a>
+
+    <a class="card" href="maze.html">
+      <h2>迷宫生成与寻路</h2>
+      <p>递归回溯生成随机迷宫，再让 BFS 与 A* 同时跑一遍，比较访问格数差多少。</p>
+      <div class="meta"><span>DFS</span><span>BFS</span><span>A*</span></div>
+      <div class="go">生成一座迷宫 →</div>
+    </a>
+
+  </div>
+
+  <div class="foot">
+    <span>纯静态页面 · 托管在 GitHub Pages</span>
+    <span><a href="../index.html">返回作品集</a></span>
+  </div>
+
+</div>
+</body>
+</html>

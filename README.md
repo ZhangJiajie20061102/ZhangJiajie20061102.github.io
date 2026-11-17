@@ -11,6 +11,12 @@
 .
 ├── index.html                      # 主页：Hero / 项目 / 能力 / 关于
 ├── solve.html                      # 一元二次方程求解器（主页第 06 张卡片指向它）
+├── lab/
+│   ├── index.html                  # 在线小工具集入口（主页第 09 张卡片指向它）
+│   ├── typing.html / typing.js     # 打字测速
+│   ├── 2048.html  / game2048.js    # 2048
+│   ├── maze.html  / maze.js        # 迷宫生成与寻路对比
+│   └── style.css                   # 三个工具共享的样式
 ├── archive/
 │   └── index-2026-04-original.html # 旧版首页留档（当初的 CSS 3D 立方体）
 └── README.md
@@ -18,7 +24,7 @@
 
 ## 功能
 
-- **项目卡片**：六个仓库，含在线 Demo 与源码链接，按技术栈筛选（小程序 / Python / Java / 前端 / 数据）
+- **项目卡片**：八个仓库、九个入口，状态徽章区分「在线可用 / 仅微信内 / 仅本地」，按技术栈筛选（小程序 / Python / Java / 前端 / 数据）
 - **滚动入场**：`IntersectionObserver` 驱动，同组元素依次错开 70ms；尊重 `prefers-reduced-motion`
 - **响应式**：≥820px 双列卡片，更窄自动单列；移动端隐藏次级导航
 - **无障碍**：筛选按钮带 `aria-pressed`，键盘焦点有可见描边，结果区域用 `aria-live` 播报
@@ -44,6 +50,14 @@ python -m http.server 8000
 
 结果区同时展示判别式的逐步计算，输入变化时实时重算。
 
+## 在线小工具集（lab/）
+
+三个纯前端工具，零依赖、无构建、无后端，数据只写 `localStorage`：
+
+- **打字测速**：逐字符判定对错，实时算 WPM 与准确率，60 秒倒计时
+- **2048**：完整合并规则、分数与最高分、一步撤销
+- **迷宫寻路**：递归回溯生成完美迷宫，同一张图上跑 BFS 与 A*，对比访问格数，可从起点手动走
+
 ## 部署
 
 推送到 `main` 分支即由 GitHub Pages 自动发布，无需额外配置。
@@ -56,3 +70,5 @@ python -m http.server 8000
 | [qq-chat-demo](https://github.com/ZhangJiajie20061102/qq-chat-demo) | 多线程 socket 聊天程序，76 项自动化测试 |
 | [hanoi-3d-game](https://github.com/ZhangJiajie20061102/hanoi-3d-game) | 纯原生 3D 汉诺塔，递归自动解题 |
 | [attendance](https://github.com/ZhangJiajie20061102/attendance) | Java Servlet + Docker，已部署 Render |
+| [wenqu](https://github.com/ZhangJiajie20061102/wenqu) | 问答社区，Node 22 内置 SQLite，一人一票由联合主键保证 |
+| [netdoctor](https://github.com/ZhangJiajie20061102/netdoctor) | 网络环境诊断器，Python 标准库，检测代理 / TUN MTU / 残留驱动 |
