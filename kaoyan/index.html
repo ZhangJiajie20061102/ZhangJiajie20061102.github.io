@@ -9,32 +9,18 @@
 <script>document.documentElement.className = 'js';</script>
 </head>
 <body>
-<div class="wrap">
-
+<div class="topwrap">
   <header class="topbar">
     <div class="brand">
       <span class="brand-mark">考</span>
-      <span class="brand-name"><b>考研决策台</b> / ky-console</span>
+      <span class="brand-name">考研决策台<i>ky-console</i></span>
     </div>
     <nav>
-      <a href="../index.html">← 作品集</a>
+      <a href="../index.html">作品集</a>
       <a href="../lab/index.html">Lab</a>
       <a href="https://yz.chsi.com.cn/" target="_blank" rel="noopener">研招网</a>
     </nav>
   </header>
-
-  <div class="eyebrow">Decision Console · 2027 考研</div>
-  <h1>把「我考了 X 分够不够」<br>换成一个<em>分位数</em></h1>
-  <p class="lede">
-    国家线只是最低门槛，它不告诉你排第几。这个工具做两件事：查官方国家线，以及用你手上的拟录取分数样本，
-    算出你的分数在那所学校处于第几百分位、上方还剩多少人、够不够进招生名额。
-  </p>
-
-  <div class="countdown">
-    <div class="cd-num" id="cdNum">—<small>天</small></div>
-    <div class="cd-text" id="cdText">距 2027 考研初试</div>
-    <div class="cd-exam" id="cdExam">初试 2026-12-19 至 12-20<br>报名已于 10-24 截止</div>
-  </div>
 
   <div class="tabs" role="tablist">
     <button class="tab" role="tab" aria-selected="true"  aria-controls="p-timeline" data-tab="p-timeline">时间轴</button>
@@ -42,6 +28,25 @@
     <button class="tab" role="tab" aria-selected="false" aria-controls="p-dist"     data-tab="p-dist">分数分布</button>
     <button class="tab" role="tab" aria-selected="false" aria-controls="p-goals"    data-tab="p-goals">目标池</button>
   </div>
+</div>
+
+<div class="wrap">
+
+  <section class="hero">
+    <div class="hero-main">
+      <div class="eyebrow">2027 考研 · 决策台</div>
+      <h1>把「我考了 X 分够不够」<br>换成一个<em>分位数</em></h1>
+      <p class="lede">
+        国家线只是最低门槛，它不告诉你排第几。这个工具做两件事：查官方国家线，以及用你手上的拟录取分数样本，
+        算出你的分数在那所学校处于第几百分位、上方还剩多少人、够不够进招生名额。
+      </p>
+    </div>
+    <div class="countdown">
+      <div class="cd-num" id="cdNum">—<small>天</small></div>
+      <div class="cd-text" id="cdText">距 2027 考研初试</div>
+      <div class="cd-exam" id="cdExam">初试 2026-12-19 至 12-20<br>报名已于 10-24 截止</div>
+    </div>
+  </section>
 
   <!-- 时间轴 -->
   <section class="panel on" id="p-timeline" role="tabpanel">
@@ -73,7 +78,7 @@
       </label>
       <span class="spacer"></span>
       <label class="field">
-        <input type="search" id="lineFilter" placeholder="搜门类，如 工学" style="width:160px;background:#0f1013;border:1px solid var(--line);border-radius:7px;padding:7px 10px;color:var(--text)">
+        <input type="search" id="lineFilter" placeholder="搜门类，如 工学" style="width:160px">
       </label>
     </div>
 
@@ -96,7 +101,7 @@
 
     <div class="row" style="margin-bottom:10px">
       <label class="field">目标院校 / 专业
-        <input type="text" id="targetName" placeholder="如：XX 大学 计算机学硕" style="width:230px;background:#0f1013;border:1px solid var(--line);border-radius:7px;padding:7px 10px;color:var(--text)">
+        <input type="text" id="targetName" placeholder="如：XX 大学 计算机学硕" style="width:230px">
       </label>
       <label class="field">我的分数
         <input type="number" id="distScore" min="0" max="500" placeholder="380">

@@ -245,7 +245,7 @@
       var mx = x(st.you), my = boxY - 16;
       parts.push('<line class="tick" x1="' + mx + '" y1="' + (my + 6) + '" x2="' + mx + '" y2="' + axisY + '"/>');
       parts.push('<path class="you" d="M' + mx + ' ' + (my + 7) + ' l6 -8 l-12 0 z"/>');
-      parts.push('<text x="' + mx + '" y="' + (my - 4) + '" text-anchor="middle" fill="#d4af57" style="font-size:11px">你 ' + fmt(st.you, 0) + '</text>');
+      parts.push('<text x="' + mx + '" y="' + (my - 4) + '" text-anchor="middle" fill="#1a8917" style="font-size:11px">你 ' + fmt(st.you, 0) + '</text>');
     }
     // 刻度
     [[st.min, '最低'], [st.median, '中位'], [st.max, '最高']].forEach(function (p) {
@@ -291,23 +291,23 @@
       title = '还没填分数';
       sub = '在上面的「我的分数」填一个数，就会算出分位和安全边际。';
     } else if (z >= 1.5) {
-      verdictCls = 'v-very-stable'; mark = '▮';
+      verdictCls = 'v-very-stable'; mark = '保';
       title = '保底区间';
       sub = '比样本均值高 ' + fmt(z, 2) + ' 个标准差，样本里只有 ' + above + ' 人高于你。';
     } else if (z >= 0.8) {
-      verdictCls = 'v-stable'; mark = '▮';
+      verdictCls = 'v-stable'; mark = '稳';
       title = '稳妥区间';
       sub = '高于均值 ' + fmt(z, 2) + ' 个标准差，属于录取区间靠前的位置。';
     } else if (z >= 0) {
-      verdictCls = 'v-edge'; mark = '▯';
+      verdictCls = 'v-edge'; mark = '擦';
       title = '擦线区间';
       sub = '略高于均值，上方还有 ' + above + ' 人，复试与调剂要同步准备。';
     } else if (z >= -0.8) {
-      verdictCls = 'v-risky'; mark = '▯';
+      verdictCls = 'v-risky'; mark = '冲';
       title = '偏险';
       sub = '低于样本均值 ' + fmt(Math.abs(z), 2) + ' 个标准差，上方 ' + above + ' 人。';
     } else {
-      verdictCls = 'v-high'; mark = '✕';
+      verdictCls = 'v-high'; mark = '险';
       title = '高风险';
       sub = '低于均值 ' + fmt(Math.abs(z), 2) + ' 个标准差，建议要么换目标，要么把分数再提 ' +
             fmt(st.median - score + 5, 0) + ' 分以上。';
